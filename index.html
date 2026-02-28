@@ -30,6 +30,8 @@
         .weather-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
         .weather-temp { font-size: 36px; font-weight: bold; }
         .weather-tips { margin-top: 10px; font-size: 14px; opacity: 0.9; }
+        .load-more { background: #4a9a7a; color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 14px; margin: 20px auto; display: block; }
+        .load-more:hover { background: #3d8a6a; }
     </style>
 </head>
 <body>
@@ -63,56 +65,56 @@
 
     <script>
         const herbs = [
-            { name: "人參", category: "補氣", taste: "甘、微苦，性溫", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服" },
-            { name: "黨參", category: "補氣", taste: "甘、微酸，性平", effect: "補中益氣，健脾益肺，生津止渴", usage: "煎服9-15克", caution: "氣滯、肝火盛者慎用" },
-            { name: "黃芪", category: "補氣", taste: "甘，性溫", effect: "補氣升陽，固表止汗，利水消腫，托毒生肌", usage: "煎服9-30克", caution: "表實邪盛、氣滯濕阻者慎用" },
-            { name: "當歸", category: "補血", taste: "甘、辛，性溫", effect: "補血活血，調經止痛，潤腸通便", usage: "煎服6-12克", caution: "濕盛中滿、大便溏泄者慎用" },
-            { name: "紅棗", category: "補血", taste: "甘，性溫", effect: "補中益氣，養血安神，緩和藥性", usage: "煎服6-15克，或生食", caution: "濕盛、齲齒疼痛者慎用" },
-            { name: "枸杞子", category: "補陰", taste: "甘，性平", effect: "滋補肝腎，益精明目，潤肺", usage: "煎服6-12克", caution: "外感發熱、脾虛便溏者不宜" },
-            { name: "百合", category: "補陰", taste: "甘、微苦，性微寒", effect: "潤肺止咳，清心安神", usage: "煎服6-12克", caution: "風寒咳嗽、脾虛便溏者慎用" },
-            { name: "麥冬", category: "補陰", taste: "甘、微苦，性微寒", effect: "養陰潤肺，益胃生津，清心除煩", usage: "煎服6-12克", caution: "脾胃虛寒、風寒咳嗽者慎用" },
-            { name: "玉竹", category: "補陰", taste: "甘，性平", effect: "養陰潤燥，生津止渴", usage: "煎服6-12克", caution: "脾虛便溏、痰濕者慎用" },
-            { name: "金銀花", category: "清熱", taste: "甘，性寒", effect: "清熱解毒，疏散風熱", usage: "煎服6-15克", caution: "脾胃虛寒、氣虛瘡膿者慎用" },
-            { name: "菊花", category: "清熱", taste: "甘、苦，性微寒", effect: "疏散風熱，平肝明目，清熱解毒", usage: "煎服5-10克", caution: "氣虛胃寒、食少泄瀉者慎用" },
-            { name: "夏枯草", category: "清熱", taste: "辛、苦，性寒", effect: "清肝瀉火，散結消腫", usage: "煎服9-15克", caution: "脾胃虛弱者慎用" },
-            { name: "板藍根", category: "清熱", taste: "苦，性寒", effect: "清熱解毒，涼血利咽", usage: "煎服9-15克", caution: "脾胃虛寒者慎用" },
-            { name: "連翹", category: "清熱", taste: "苦，性微寒", effect: "清熱解毒，消腫散結", usage: "煎服6-15克", caution: "脾胃虛寒者慎用" },
-            { name: "陳皮", category: "理氣", taste: "辛、苦，性溫", effect: "理氣健脾，燥濕化痰", usage: "煎服3-10克", caution: "氣虛、陰虛燥咳者慎用" },
-            { name: "枳殼", category: "理氣", taste: "苦、酸，性微寒", effect: "理氣寬中，行滯消脹", usage: "煎服3-10克", caution: "孕婦慎用" },
-            { name: "香附", category: "理氣", taste: "辛、微苦、微甘，性平", effect: "疏肝解鬱，理氣寬中，調經止痛", usage: "煎服6-9克", caution: "氣虛者慎用" },
-            { name: "川芎", category: "活血", taste: "辛，性溫", effect: "活血行氣，祛風止痛", usage: "煎服3-10克", caution: "月經過多、陰虛火旺者慎用" },
-            { name: "丹參", category: "活血", taste: "苦，性微寒", effect: "活血祛瘀，通經止痛，清心除煩", usage: "煎服9-15克", caution: "孕婦、出血傾向者慎用" },
-            { name: "赤芍", category: "活血", taste: "苦，性微寒", effect: "清熱涼血，散瘀止痛", usage: "煎服6-12克", caution: "脾胃虛寒者慎用" },
-            { name: "甘草", category: "補氣", taste: "甘，性平", effect: "補脾益氣，清熱解毒，祛痰止咳，緩急止痛，調和諸藥", usage: "煎服2-10克", caution: "不宜與海藻、甘遂、大戟等同用，長期服用需注意血壓" },
-            { name: "白朮", category: "補氣", taste: "甘、苦，性溫", effect: "健脾益胃，燥濕利水，止汗安胎", usage: "煎服6-12克", caution: "陰虛燥咳、津傷者慎用" },
-            { name: "山藥", category: "補氣", taste: "甘，性平", effect: "補脾益肺，益腎固精", usage: "煎服15-30克", caution: "濕盛中滿者慎用" },
-            { name: "茯苓", category: "利水", taste: "甘、淡，性平", effect: "利水滲濕，健脾寧心", usage: "煎服9-15克", caution: "腎虛者慎用" },
-            { name: "薏仁", category: "利水", taste: "甘、淡，性微寒", effect: "利水滲濕，健脾止瀉，除痹，排膿", usage: "煎服9-30克", caution: "孕婦慎用" },
-            { name: "澤瀉", category: "利水", taste: "甘、淡，性寒", effect: "利水滲濕，泄熱", usage: "煎服6-10克", caution: "腎虛者慎用" },
-            { name: "車前草", category: "利水", taste: "甘，性寒", effect: "利尿通淋，滲濕止瀉，清肝明目，清肺化痰", usage: "煎服9-15克", caution: "腎虛滑精者慎用" },
-            { name: "靈芝", category: "補氣", taste: "甘，性平", effect: "補氣安神，止咳平喘，增強免疫力", usage: "煎服3-6克，或研末吞服", caution: "手術前後一週慎用" },
-            { name: "冬蟲夏草", category: "補氣", taste: "甘，性平", effect: "補腎益肺，止血化痰", usage: "煎服3-9克，或燉湯", caution: "陰虛火旺者慎用" },
-            { name: "何首烏", category: "補血", taste: "苦、甘、澀，性微溫", effect: "補益精血，固腎烏鬚，生津潤腸", usage: "煎服10-30克", caution: "肝腎功能異常者慎用" },
-            { name: "熟地黃", category: "補血", taste: "甘，性微溫", effect: "補血滋陰，益精填髓", usage: "煎服9-15克", caution: "脾胃虛弱、氣滯者慎用" },
-            { name: "白芍", category: "補血", taste: "苦、酸，性微寒", effect: "養血調經，斂陰止汗，柔肝止痛，平抑肝陽", usage: "煎服6-15克", caution: "虛寒證、腹瀉者慎用" },
-            { name: "阿膠", category: "補血", taste: "甘，性平", effect: "補血止血，滋陰潤燥", usage: "烊化兌服3-9克", caution: "脾胃虛弱者慎用" },
-            { name: "桂枝", category: "解表", taste: "辛、甘，性溫", effect: "發汗解肌，溫通經脈，助陽化氣", usage: "煎服3-9克", caution: "溫病、陰虛火旺者慎用" },
-            { name: "生薑", category: "解表", taste: "辛，性溫", effect: "解表散寒，溫中止嘔，溫肺止咳", usage: "煎服3-9克", caution: "陰虛火旺者慎用" },
-            { name: "紫蘇葉", category: "解表", taste: "辛，性溫", effect: "解表散寒，行氣和胃，解魚蟹毒", usage: "煎服5-9克", caution: "氣虛者慎用" },
-            { name: "薄荷", category: "解表", taste: "辛，性涼", effect: "疏散風熱，清利頭目，利咽透疹，疏肝行氣", usage: "煎服3-6克", caution: "陰虛體質、脾胃虛寒者慎用" },
-            { name: "桑葉", category: "解表", taste: "甘、苦，性寒", effect: "疏散風熱，清肺潤燥，平肝明目", usage: "煎服5-10克", caution: "脾胃虛寒者慎用" },
-            { name: "葛根", category: "解表", taste: "甘、辛，性涼", effect: "解肌退熱，透疹生津，升陽止瀉", usage: "煎服9-15克", caution: "表虛多汗、胃寒者慎用" },
-            { name: "五味子", category: "收斂", taste: "酸、甘，性溫", effect: "收斂固澀，益氣生津，補腎寧心", usage: "煎服2-6克", caution: "表邪未解、內有熱盛者慎用" },
-            { name: "酸棗仁", category: "安神", taste: "甘、酸，性平", effect: "養心益肝，安神斂汗", usage: "煎服9-15克", caution: "滑泄者慎用" },
-            { name: "遠志", category: "安神", taste: "辛、苦，性溫", effect: "安神益智，祛痰開竅，消散癰腫", usage: "煎服3-10克", caution: "陰虛火旺、心動過速者慎用" },
-            { name: "天麻", category: "平肝", taste: "甘，性平", effect: "息風止痙，平抑肝陽，祛風通絡", usage: "煎服3-10克", caution: "陰虛者慎用" },
-            { name: "鉤藤", category: "平肝", taste: "甘，性涼", effect: "清熱平肝，息風止痙", usage: "煎服3-12克", caution: "脾胃虛寒者慎用" },
-            { name: "羅漢果", category: "化痰", taste: "甘，性涼", effect: "清熱潤肺，利咽開音，滑腸通便", usage: "煎服9-15克", caution: "脾胃虛寒者慎用" },
-            { name: "胖大海", category: "化痰", taste: "甘，性寒", effect: "清熱潤肺，利咽開音，潤腸通便", usage: "沸水泡服2-3枚", caution: "脾胃虛寒者慎用" },
-            { name: "杏仁", category: "化痰", taste: "苦，性溫", effect: "降氣止咳平喘，潤腸通便", usage: "煎服5-10克", caution: "嬰兒慎用，不宜過量" },
-            { name: "川貝母", category: "化痰", taste: "苦、甘，性微寒", effect: "清熱潤肺，化痰止咳，散結消腫", usage: "煎服3-10克", caution: "脾胃虛寒、寒痰者慎用" },
-            { name: "薑黃", category: "活血", taste: "辛、苦，性溫", effect: "破血行氣，通經止痛", usage: "煎服3-10克", caution: "孕婦、血虛者慎用" },
-            { name: "益母草", category: "活血", taste: "辛、苦，性微寒", effect: "活血調經，利尿消腫，清熱解毒", usage: "煎服9-30克", caution: "孕婦慎用" }
+            { name: "人參", category: "補氣", taste: "甘、微苦，性溫", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服", priority: 1 },
+            { name: "當歸", category: "補血", taste: "甘、辛，性溫", effect: "補血活血，調經止痛，潤腸通便", usage: "煎服6-12克", caution: "濕盛中滿、大便溏泄者慎用", priority: 2 },
+            { name: "黃芪", category: "補氣", taste: "甘，性溫", effect: "補氣升陽，固表止汗，利水消腫，托毒生肌", usage: "煎服9-30克", caution: "表實邪盛、氣滯濕阻者慎用", priority: 3 },
+            { name: "枸杞子", category: "補陰", taste: "甘，性平", effect: "滋補肝腎，益精明目，潤肺", usage: "煎服6-12克", caution: "外感發熱、脾虛便溏者不宜", priority: 4 },
+            { name: "紅棗", category: "補血", taste: "甘，性溫", effect: "補中益氣，養血安神，緩和藥性", usage: "煎服6-15克，或生食", caution: "濕盛、齲齒疼痛者慎用", priority: 5 },
+            { name: "菊花", category: "清熱", taste: "甘、苦，性微寒", effect: "疏散風熱，平肝明目，清熱解毒", usage: "煎服5-10克", caution: "氣虛胃寒、食少泄瀉者慎用", priority: 6 },
+            { name: "陳皮", category: "理氣", taste: "辛、苦，性溫", effect: "理氣健脾，燥濕化痰", usage: "煎服3-10克", caution: "氣虛、陰虛燥咳者慎用", priority: 7 },
+            { name: "甘草", category: "補氣", taste: "甘，性平", effect: "補脾益氣，清熱解毒，祛痰止咳，緩急止痛，調和諸藥", usage: "煎服2-10克", caution: "不宜與海藻、甘遂、大戟等同用，長期服用需注意血壓", priority: 8 },
+            { name: "黨參", category: "補氣", taste: "甘、微酸，性平", effect: "補中益氣，健脾益肺，生津止渴", usage: "煎服9-15克", caution: "氣滯、肝火盛者慎用", priority: 9 },
+            { name: "白朮", category: "補氣", taste: "甘、苦，性溫", effect: "健脾益胃，燥濕利水，止汗安胎", usage: "煎服6-12克", caution: "陰虛燥咳、津傷者慎用", priority: 10 },
+            { name: "茯苓", category: "利水", taste: "甘、淡，性平", effect: "利水滲濕，健脾寧心", usage: "煎服9-15克", caution: "腎虛者慎用", priority: 11 },
+            { name: "山藥", category: "補氣", taste: "甘，性平", effect: "補脾益肺，益腎固精", usage: "煎服15-30克", caution: "濕盛中滿者慎用", priority: 12 },
+            { name: "生薑", category: "解表", taste: "辛，性溫", effect: "解表散寒，溫中止嘔，溫肺止咳", usage: "煎服3-9克", caution: "陰虛火旺者慎用", priority: 13 },
+            { name: "桂枝", category: "解表", taste: "辛、甘，性溫", effect: "發汗解肌，溫通經脈，助陽化氣", usage: "煎服3-9克", caution: "溫病、陰虛火旺者慎用", priority: 14 },
+            { name: "金銀花", category: "清熱", taste: "甘，性寒", effect: "清熱解毒，疏散風熱", usage: "煎服6-15克", caution: "脾胃虛寒、氣虛瘡膿者慎用", priority: 15 },
+            { name: "百合", category: "補陰", taste: "甘、微苦，性微寒", effect: "潤肺止咳，清心安神", usage: "煎服6-12克", caution: "風寒咳嗽、脾虛便溏者慎用", priority: 16 },
+            { name: "麥冬", category: "補陰", taste: "甘、微苦，性微寒", effect: "養陰潤肺，益胃生津，清心除煩", usage: "煎服6-12克", caution: "脾胃虛寒、風寒咳嗽者慎用", priority: 17 },
+            { name: "川芎", category: "活血", taste: "辛，性溫", effect: "活血行氣，祛風止痛", usage: "煎服3-10克", caution: "月經過多、陰虛火旺者慎用", priority: 18 },
+            { name: "丹參", category: "活血", taste: "苦，性微寒", effect: "活血祛瘀，通經止痛，清心除煩", usage: "煎服9-15克", caution: "孕婦、出血傾向者慎用", priority: 19 },
+            { name: "薏仁", category: "利水", taste: "甘、淡，性微寒", effect: "利水滲濕，健脾止瀉，除痹，排膿", usage: "煎服9-30克", caution: "孕婦慎用", priority: 20 },
+            { name: "白芍", category: "補血", taste: "苦、酸，性微寒", effect: "養血調經，斂陰止汗，柔肝止痛，平抑肝陽", usage: "煎服6-15克", caution: "虛寒證、腹瀉者慎用", priority: 21 },
+            { name: "熟地黃", category: "補血", taste: "甘，性微溫", effect: "補血滋陰，益精填髓", usage: "煎服9-15克", caution: "脾胃虛弱、氣滯者慎用", priority: 22 },
+            { name: "何首烏", category: "補血", taste: "苦、甘、澀，性微溫", effect: "補益精血，固腎烏鬚，生津潤腸", usage: "煎服10-30克", caution: "肝腎功能異常者慎用", priority: 23 },
+            { name: "玉竹", category: "補陰", taste: "甘，性平", effect: "養陰潤燥，生津止渴", usage: "煎服6-12克", caution: "脾虛便溏、痰濕者慎用", priority: 24 },
+            { name: "薄荷", category: "解表", taste: "辛，性涼", effect: "疏散風熱，清利頭目，利咽透疹，疏肝行氣", usage: "煎服3-6克", caution: "陰虛體質、脾胃虛寒者慎用", priority: 25 },
+            { name: "桑葉", category: "解表", taste: "甘、苦，性寒", effect: "疏散風熱，清肺潤燥，平肝明目", usage: "煎服5-10克", caution: "脾胃虛寒者慎用", priority: 26 },
+            { name: "葛根", category: "解表", taste: "甘、辛，性涼", effect: "解肌退熱，透疹生津，升陽止瀉", usage: "煎服9-15克", caution: "表虛多汗、胃寒者慎用", priority: 27 },
+            { name: "紫蘇葉", category: "解表", taste: "辛，性溫", effect: "解表散寒，行氣和胃，解魚蟹毒", usage: "煎服5-9克", caution: "氣虛者慎用", priority: 28 },
+            { name: "靈芝", category: "補氣", taste: "甘，性平", effect: "補氣安神，止咳平喘，增強免疫力", usage: "煎服3-6克，或研末吞服", caution: "手術前後一週慎用", priority: 29 },
+            { name: "天麻", category: "平肝", taste: "甘，性平", effect: "息風止痙，平抑肝陽，祛風通絡", usage: "煎服3-10克", caution: "陰虛者慎用", priority: 30 },
+            { name: "酸棗仁", category: "安神", taste: "甘、酸，性平", effect: "養心益肝，安神斂汗", usage: "煎服9-15克", caution: "滑泄者慎用", priority: 31 },
+            { name: "五味子", category: "收斂", taste: "酸、甘，性溫", effect: "收斂固澀，益氣生津，補腎寧心", usage: "煎服2-6克", caution: "表邪未解、內有熱盛者慎用", priority: 32 },
+            { name: "遠志", category: "安神", taste: "辛、苦，性溫", effect: "安神益智，祛痰開竅，消散癰腫", usage: "煎服3-10克", caution: "陰虛火旺、心動過速者慎用", priority: 33 },
+            { name: "鉤藤", category: "平肝", taste: "甘，性涼", effect: "清熱平肝，息風止痙", usage: "煎服3-12克", caution: "脾胃虛寒者慎用", priority: 34 },
+            { name: "澤瀉", category: "利水", taste: "甘、淡，性寒", effect: "利水滲濕，泄熱", usage: "煎服6-10克", caution: "腎虛者慎用", priority: 35 },
+            { name: "車前草", category: "利水", taste: "甘，性寒", effect: "利尿通淋，滲濕止瀉，清肝明目，清肺化痰", usage: "煎服9-15克", caution: "腎虛滑精者慎用", priority: 36 },
+            { name: "阿膠", category: "補血", taste: "甘，性平", effect: "補血止血，滋陰潤燥", usage: "烊化兌服3-9克", caution: "脾胃虛弱者慎用", priority: 37 },
+            { name: "冬蟲夏草", category: "補氣", taste: "甘，性平", effect: "補腎益肺，止血化痰", usage: "煎服3-9克，或燉湯", caution: "陰虛火旺者慎用", priority: 38 },
+            { name: "板藍根", category: "清熱", taste: "苦，性寒", effect: "清熱解毒，涼血利咽", usage: "煎服9-15克", caution: "脾胃虛寒者慎用", priority: 39 },
+            { name: "夏枯草", category: "清熱", taste: "辛、苦，性寒", effect: "清肝瀉火，散結消腫", usage: "煎服9-15克", caution: "脾胃虛弱者慎用", priority: 40 },
+            { name: "連翹", category: "清熱", taste: "苦，性微寒", effect: "清熱解毒，消腫散結", usage: "煎服6-15克", caution: "脾胃虛寒者慎用", priority: 41 },
+            { name: "枳殼", category: "理氣", taste: "苦、酸，性微寒", effect: "理氣寬中，行滯消脹", usage: "煎服3-10克", caution: "孕婦慎用", priority: 42 },
+            { name: "香附", category: "理氣", taste: "辛、微苦、微甘，性平", effect: "疏肝解鬱，理氣寬中，調經止痛", usage: "煎服6-9克", caution: "氣虛者慎用", priority: 43 },
+            { name: "赤芍", category: "活血", taste: "苦，性微寒", effect: "清熱涼血，散瘀止痛", usage: "煎服6-12克", caution: "脾胃虛寒者慎用", priority: 44 },
+            { name: "薑黃", category: "活血", taste: "辛、苦，性溫", effect: "破血行氣，通經止痛", usage: "煎服3-10克", caution: "孕婦、血虛者慎用", priority: 45 },
+            { name: "益母草", category: "活血", taste: "辛、苦，性微寒", effect: "活血調經，利尿消腫，清熱解毒", usage: "煎服9-30克", caution: "孕婦慎用", priority: 46 },
+            { name: "羅漢果", category: "化痰", taste: "甘，性涼", effect: "清熱潤肺，利咽開音，滑腸通便", usage: "煎服9-15克", caution: "脾胃虛寒者慎用", priority: 47 },
+            { name: "胖大海", category: "化痰", taste: "甘，性寒", effect: "清熱潤肺，利咽開音，潤腸通便", usage: "沸水泡服2-3枚", caution: "脾胃虛寒者慎用", priority: 48 },
+            { name: "杏仁", category: "化痰", taste: "苦，性溫", effect: "降氣止咳平喘，潤腸通便", usage: "煎服5-10克", caution: "嬰兒慎用，不宜過量", priority: 49 },
+            { name: "川貝母", category: "化痰", taste: "苦、甘，性微寒", effect: "清熱潤肺，化痰止咳，散結消腫", usage: "煎服3-10克", caution: "脾胃虛寒、寒痰者慎用", priority: 50 }
         ];
 
         const weatherTips = {
@@ -124,17 +126,34 @@
         };
 
         let currentHerb = null;
+        let displayCount = 5;
+        const LOAD_MORE_COUNT = 10;
 
         function renderHerbs(filter = "") {
             const list = document.getElementById("herbList");
-            const filtered = herbs.filter(h => h.name.includes(filter) || h.category.includes(filter) || h.effect.includes(filter));
-            list.innerHTML = filtered.map(h => `
+            let filtered = herbs.filter(h => h.name.includes(filter) || h.category.includes(filter) || h.effect.includes(filter));
+            
+            // Sort by priority (common first)
+            filtered.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+            
+            const toShow = filtered.slice(0, displayCount);
+            list.innerHTML = toShow.map(h => `
                 <div class="herb-card" onclick="showDetail('${h.name}')">
                     <div class="herb-name">${h.name}</div>
                     <span class="herb-category">${h.category}</span>
                     <div class="herb-effect">${h.effect.substring(0, 50)}...</div>
                 </div>
             `).join("");
+            
+            // Add load more button if there are more results
+            if (filtered.length > displayCount) {
+                list.innerHTML += '<button class="load-more" onclick="loadMore()">載入更多 (' + (filtered.length - displayCount) + ')</button>';
+            }
+        }
+
+        function loadMore() {
+            displayCount += LOAD_MORE_COUNT;
+            renderHerbs(document.getElementById("searchInput").value);
         }
 
         function showDetail(name) {
@@ -157,7 +176,10 @@
             alert(currentHerb ? "已收藏：" + currentHerb.name : "");
         }
 
-        document.getElementById("searchInput").addEventListener("input", e => renderHerbs(e.target.value));
+        document.getElementById("searchInput").addEventListener("input", e => {
+            displayCount = 5;
+            renderHerbs(e.target.value);
+        });
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async pos => {
