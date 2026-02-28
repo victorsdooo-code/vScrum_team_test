@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中醫小幫手</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "PingFang HK", "Microsoft JhengHei", sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; color: #2d5a4a; margin-bottom: 20px; }
+        .search-box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input { width: 100%; padding: 12px 15px; font-size: 16px; border: 2px solid #ddd; border-radius: 10px; outline: none; transition: border-color 0.3s; }
+        input:focus { border-color: #4a9a7a; }
+        .herb-list { display: flex; flex-direction: column; gap: 15px; }
+        .herb-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .herb-card:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.12); }
+        .herb-name { font-size: 20px; font-weight: bold; color: #2d5a4a; margin-bottom: 8px; }
+        .herb-category { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 10px; }
+        .herb-effect { color: #666; line-height: 1.6; }
+        .detail-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .detail-modal.active { display: flex; align-items: center; justify-content: center; }
+        .detail-content { background: white; padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .detail-close { float: right; font-size: 24px; cursor: pointer; color: #999; }
+        .detail-title { font-size: 24px; color: #2d5a4a; margin-bottom: 15px; }
+        .detail-row { margin-bottom: 12px; }
+        .detail-label { font-weight: bold; color: #333; }
+        .detail-value { color: #666; }
+        .favorite-btn { background: #ffc107; color: #333; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 14px; margin-top: 15px; }
+        .weather-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        .weather-temp { font-size: 36px; font-weight: bold; }
+        .weather-tips { margin-top: 10px; font-size: 14px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌿 中醫小幫手</h1>
+        
+        <div class="weather-section" id="weatherSection">
+            <div>📍 <span id="location">載入中...</span></div>
+            <div class="weather-temp"><span id="temp">--</span>°C</div>
+            <div class="weather-tips" id="weatherTips">養生小貼士載入中...</div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 搜尋中藥材...">
+        </div>
+
+        <div class="herb-list" id="herbList"></div>
+    </div>
+
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-content">
+            <span class="detail-close" onclick="closeDetail()">&times;</span>
+            <div class="detail-title" id="detailTitle"></div>
+            <div class="detail-row"><span class="detail-label">性味：</span><span class="detail-value" id="detailTaste"></span></div>
+            <div class="detail-row"><span class="detail-label">功效：</span><span class="detail-value" id="detailEffect"></span></div>
+            <div class="detail-row"><span class="detail-label">用法：</span><span class="detail-value" id="detailUsage"></span></div>
+            <div class="detail-row"><span class="detail-label">禁忌：</span><span class="detail-value" id="detailCaution"></span></div>
+            <button class="favorite-btn" onclick="toggleFavorite()">⭐ 收藏</button>
+        </div>
+    </div>
+
+    <script>
+        const herbs = [
+            { name: "人參", category: "補氣", taste: "甘、微苦，性溫", effect: "大補元氣，復脈固脫，補脾益肺，生津養血", usage: "煎服3-9克，或研末吞服", caution: "實熱證、正虛表邪未解者慎用", tags: ["補氣", "人參"] },
+            { name: "當歸", category: "補血", taste: "甘、辛，性溫", effect: "補血活血，調經止痛，潤腸通便", usage: "煎服6-12克", caution: "濕盛中滿、大便溏泄者慎用", tags: ["補血", "當歸"] },
+            { name: "黃芪", category: "補氣", taste: "甘，性溫", effect: "補氣升陽，固表止汗，利水消腫，生津養血", usage: "煎服9-30克", caution: "表實邪盛、氣滯濕阻者慎用", tags: ["補氣", "黃芪"] },
+            { name: "枸杞子", category: "補陰", taste: "甘，性平", effect: "滋補肝腎，益精明目", usage: "煎服6-12克", caution: "外感發熱、脾虛便溏者不宜", tags: ["補陰", "枸杞"] },
+            { name: "金銀花", category: "清熱", taste: "甘，性寒", effect: "清熱解毒，疏散風熱", usage: "煎服6-15克", caution: "脾胃虛寒、氣虛瘡膿者慎用", tags: ["清熱", "金銀花"] },
+            { name: "菊花", category: "清熱", taste: "甘、苦，性微寒", effect: "疏散風熱，平肝明目，清熱解毒", usage: "煎服5-10克", caution: "氣虛胃寒、食少泄瀉者慎用", tags: ["清熱", "菊花"] },
+            { name: "陳皮", category: "理氣", taste: "辛、苦，性溫", effect: "理氣健脾，燥濕化痰", usage: "煎服3-10克", caution: "氣虛、陰虛燥咳者慎用", tags: ["理氣", "陳皮"] },
+            { name: "川芎", category: "活血", taste: "辛，性溫", effect: "活血行氣，祛風止痛", usage: "煎服3-10克", caution: "月經過多、陰虛火旺者慎用", tags: ["活血", "川芎"] },
+            { name: "甘草", category: "補氣", taste: "甘，性平", effect: "補脾益氣，清熱解毒，祛痰止咳，緩急止痛，調和諸藥", usage: "煎服2-10克", caution: "不宜與海藻、甘遂、大戟等同用", tags: ["補氣", "甘草"] },
+            { name: "紅棗", category: "補血", taste: "甘，性溫", effect: "補中益氣，養血安神", usage: "煎服6-15克", caution: "濕盛、齲齒疼痛者慎用", tags: ["補血", "紅棗"] }
+        ];
+
+        const weatherTips = {
+            hot: "炎熱天氣：宜清熱瀉火，多飲綠豆湯、菊花茶。避免辛辣刺激性食物。",
+            cold: "寒冷天氣：宜溫補驅寒，適量生薑、紅棗桂圓茶。注意保暖，免受風寒。",
+            humid: "潮濕天氣：宜健脾祛濕，可食薏仁、赤小豆。注意通風防潮。",
+            dry: "乾燥天氣：宜滋陰潤燥，多飲百合、銀耳湯。避免熬夜傷陰。",
+            normal: "天氣舒適：宜戶外活動，適度運動增強體質。注意飲食均衡。"
+        };
+
+        let currentHerb = null;
+
+        function renderHerbs(filter = "") {
+            const list = document.getElementById("herbList");
+            const filtered = herbs.filter(h => h.name.includes(filter) || h.tags.some(t => t.includes(filter)));
+            list.innerHTML = filtered.map(h => `
+                <div class="herb-card" onclick="showDetail('${h.name}')">
+                    <div class="herb-name">${h.name}</div>
+                    <span class="herb-category">${h.category}</span>
+                    <div class="herb-effect">${h.effect.substring(0, 50)}...</div>
+                </div>
+            `).join("");
+        }
+
+        function showDetail(name) {
+            const herb = herbs.find(h => h.name === name);
+            if (!herb) return;
+            currentHerb = herb;
+            document.getElementById("detailTitle").textContent = herb.name;
+            document.getElementById("detailTaste").textContent = herb.taste;
+            document.getElementById("detailEffect").textContent = herb.effect;
+            document.getElementById("detailUsage").textContent = herb.usage;
+            document.getElementById("detailCaution").textContent = herb.caution;
+            document.getElementById("detailModal").classList.add("active");
+        }
+
+        function closeDetail() {
+            document.getElementById("detailModal").classList.remove("active");
+        }
+
+        function toggleFavorite() {
+            alert(currentHerb ? "已收藏：" + currentHerb.name : "");
+        }
+
+        document.getElementById("searchInput").addEventListener("input", e => renderHerbs(e.target.value));
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async pos => {
+                const lat = pos.coords.latitude, lon = pos.coords.longitude;
+                try {
+                    const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m");
+                    const data = await res.json();
+                    const temp = data.current.temperature_2m;
+                    const hum = data.current.relative_humidity_2m;
+                    document.getElementById("temp").textContent = temp;
+                    document.getElementById("location").textContent = "📍 您的位置";
+                    
+                    let tip = weatherTips.normal;
+                    if (temp > 30) tip = weatherTips.hot;
+                    else if (temp < 10) tip = weatherTips.cold;
+                    else if (hum > 80) tip = weatherTips.humid;
+                    else if (hum < 30) tip = weatherTips.dry;
+                    document.getElementById("weatherTips").textContent = tip;
+                } catch (e) {
+                    document.getElementById("weatherTips").textContent = "天氣載入失敗，請檢查網絡";
+                }
+            }, () => {
+                document.getElementById("location").textContent = "未獲取定位";
+                document.getElementById("weatherTips").textContent = weatherTips.normal;
+            });
+        }
+
+        renderHerbs();
+    </script>
+</body>
+</html>
