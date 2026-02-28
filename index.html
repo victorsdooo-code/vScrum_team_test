@@ -135,7 +135,7 @@
 
         function renderHerbs(filter = "") {
             const list = document.getElementById("herbList");
-            let filtered = herbs.filter(h => h.name.includes(filter) || h.category.includes(filter) || h.effect.includes(filter));
+            let filtered = herbs.filter(h => h.name.includes(filter) || h.category.includes(filter) || h.effect.includes(filter) || (h.meridian && h.meridian.includes(filter)) || (h.clinical && h.clinical.includes(filter)));
             
             // Sort by priority (common first)
             filtered.sort((a, b) => (a.priority || 999) - (b.priority || 999));
