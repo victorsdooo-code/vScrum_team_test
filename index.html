@@ -36,7 +36,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🌿 中醫小幫手</h1>
+        <h1>🌿 中醫小幫手 <span style="font-size:14px;color:#888" id="version"></span></h1>
         
         <div class="weather-section" id="weatherSection">
             <div>📍 <span id="location">載入中...</span></div>
@@ -64,6 +64,8 @@
     </div>
 
     <script>
+        const APP_VERSION = "v1.0.0";
+        
         const herbs = [
             { name: "人參", category: "補氣", taste: "甘、微苦，性溫", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服", priority: 1 },
             { name: "當歸", category: "補血", taste: "甘、辛，性溫", effect: "補血活血，調經止痛，潤腸通便", usage: "煎服6-12克", caution: "濕盛中滿、大便溏泄者慎用", priority: 2 },
@@ -206,6 +208,8 @@
                 document.getElementById("weatherTips").textContent = weatherTips.normal;
             });
         }
+
+        document.getElementById("version").textContent = APP_VERSION;
 
         renderHerbs();
     </script>
