@@ -108,7 +108,7 @@
     </div>
 
     <script>
-        const APP_VERSION = "v2.0.0";
+        const APP_VERSION = "v2.0.1";
         
         const herbs = [
             { name: "人參", compatibility: "✅ 配黃芪、當歸增強補氣血功效\n❌ 忌與蘿蔔、茶同服", pharmacology: "調節免疫功能、抗疲勞、抗衰老、促進造血、抗腫瘤", image: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200", category: "補氣", taste: "甘、微苦，性溫", meridian: "脾、肺、心、腎", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", clinical: "元氣虛脫、脾虛食少、肺虛喘咳、氣血兩虛、心悸失眠", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服", priority: 1, video: "https://www.youtube.com/embed/8Jj7C3zqjvI" },
@@ -185,7 +185,7 @@
             const toShow = filtered.slice(0, displayCount);
             list.innerHTML = toShow.map(h => `
                 <div class="herb-card" onclick="showDetail('${h.name}')">
-                    <img class="herb-thumb" src="${h.image || 'https://via.placeholder.com/60?text=' + h.name}" alt="${h.name}">
+                    <img class="herb-thumb" src="https://placehold.co/60x60/e8f5e9/2e7d32?text=${encodeURIComponent(h.name.charAt(0))}" alt="${h.name}">
                     <div class="herb-info">
                         <div class="herb-name">${h.name}</div>
                         <span class="herb-category">${h.category}</span>
