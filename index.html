@@ -147,7 +147,7 @@
             const toShow = filtered.slice(0, displayCount);
             list.innerHTML = toShow.map(h => `
                 <div class="herb-card" onclick="showDetail('\''${h.name}'\'')">
-                    <div class="herb-thumb" style="display:flex;align-items:center;justify-content:center;font-size:24px;">🌿</div>
+                    <img class="herb-thumb" src="${h.image || 'https://via.placeholder.com/60?text=' + h.name}" alt="${h.name}">
                     <div class="herb-info">
                         <div class="herb-name">${h.name}</div>
                         <span class="herb-category">${h.category}</span>
