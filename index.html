@@ -147,11 +147,11 @@
             const toShow = filtered.slice(0, displayCount);
             list.innerHTML = toShow.map(h => `
                 <div class="herb-card" onclick="showDetail('\''${h.name}'\'')">
-                    <img class="herb-thumb" src="\${h.image || 'https://via.placeholder.com/60?text=' + h.name}" alt="\${h.name}" onerror="this.src='https://via.placeholder.com/60?text=\${h.name}'">
+                    <img class="herb-thumb" src="${h.image || 'https://via.placeholder.com/60?text=' + h.name}" alt="${h.name}" onerror="this.src='https://via.placeholder.com/60?text=${h.name}'">
                     <div class="herb-info">
-                        <div class="herb-name">\${h.name}</div>
-                        <span class="herb-category">\${h.category}</span>
-                        <div class="herb-effect">\${h.effect.substring(0, 30)}...</div>
+                        <div class="herb-name">${h.name}</div>
+                        <span class="herb-category">${h.category}</span>
+                        <div class="herb-effect">${h.effect.substring(0, 30)}...</div>
                     </div>
                 </div>
             `).join("");
