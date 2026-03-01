@@ -52,6 +52,22 @@
         .image-preview img { max-width: 100%; max-height: 300px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .preview-placeholder { color: #999; font-size: 14px; padding: 20px; }
         .ai-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; margin-top: 15px; display: inline-block; }
+        
+        /* 用藥提醒 Section */
+        .medication-section { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .medication-title { font-size: 18px; color: #2d5a4a; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .medication-time-row { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
+        .medication-time-input { padding: 10px 15px; font-size: 16px; border: 2px solid #4a9a7a; border-radius: 10px; width: auto; }
+        .medication-set-btn { background: #4a9a7a; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 14px; }
+        .medication-set-btn:hover { background: #3d8a6a; }
+        .medication-log-btn { background: #2196F3; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 14px; margin-left: 10px; }
+        .medication-log-btn:hover { background: #1976D2; }
+        .medication-log-btn.taken { background: #4CAF50; }
+        .compliance-display { background: #e8f5e9; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px; }
+        .compliance-rate { font-size: 28px; font-weight: bold; color: #2e7d32; }
+        .compliance-label { font-size: 12px; color: #666; }
+        .lasttaken { font-size: 12px; color: #888; margin-top: 8px; }
+        .reminder-note { font-size: 12px; color: #666; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -63,6 +79,24 @@
             <div class="weather-temp"><span id="temp">--</span>°C</div>
             <div class="weather-tips" id="weatherTips">養生小貼士載入中...</div>
         </div>
+        
+        <!-- 用藥提醒功能 -->
+        <div class="medication-section">
+            <div class="medication-title">💊 用藥提醒</div>
+            <div class="medication-time-row">
+                <label style="color:#666;">提醒時間：</label>
+                <input type="time" id="medTimeInput" class="medication-time-input" value="08:00">
+                <button class="medication-set-btn" onclick="setMedicationTime()">設定</button>
+                <button class="medication-log-btn" id="takeMedBtn" onclick="markMedicationTaken()">💊 記錄服藥</button>
+            </div>
+            <div class="compliance-display">
+                <div class="compliance-rate" id="complianceRate">--%</div>
+                <div class="compliance-label">遵從率 (過去7天)</div>
+                <div class="lasttaken" id="lastTaken">尚未記錄服藥</div>
+            </div>
+            <div class="reminder-note" id="reminderNote">提示：設定提醒時間後，系統會提示您服藥</div>
+        </div>
+
         <!-- AI 藥材辨識功能 (MVP) -->
         <div class="ai-upload-section">
             <div class="ai-upload-title">🤖 AI 藥材辨識</div>
@@ -108,7 +142,14 @@
     </div>
 
     <script>
-        const APP_VERSION = "v2.0.1";
+        const APP_VERSION = "v3.0.0";
+        
+        // 用藥提醒數據
+        let medicationData = {
+            reminderTime: "08:00",
+            takenDates: [],
+            lastTaken: null
+        };
         
         const herbs = [
             { name: "人參", compatibility: "✅ 配黃芪、當歸增強補氣血功效\n❌ 忌與蘿蔔、茶同服", pharmacology: "調節免疫功能、抗疲勞、抗衰老、促進造血、抗腫瘤", image: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200", category: "補氣", taste: "甘、微苦，性溫", meridian: "脾、肺、心、腎", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", clinical: "元氣虛脫、脾虛食少、肺虛喘咳、氣血兩虛、心悸失眠", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服", priority: 1, video: "https://www.youtube.com/embed/8Jj7C3zqjvI" },
@@ -163,7 +204,8 @@
             { name: "川貝母", category: "化痰", taste: "苦、甘，性微寒", effect: "清熱潤肺，化痰止咳，散結消腫", usage: "煎服3-10克", caution: "脾胃虛寒、寒痰者慎用", priority: 50 }
         ];
 
-        const weatherTips = {
+        const weatherTips =
+        {
             hot: "炎熱天氣：宜清熱瀉火，多飲綠豆湯、菊花茶。避免辛辣刺激性食物。",
             cold: "寒冷天氣：宜溫補驅寒，適量生薑、紅棗桂圓茶。注意保暖，免受風寒。",
             humid: "潮濕天氣：宜健脾祛濕，可食薏仁、赤小豆。注意通風防潮。",
@@ -251,7 +293,8 @@
                 preview.innerHTML = '<div class="preview-placeholder">尚無上傳圖片</div>';
             }
         }
-function toggleFavorite() {
+
+        function toggleFavorite() {
             alert(currentHerb ? "已收藏：" + currentHerb.name : "");
         }
 
@@ -265,6 +308,83 @@ function toggleFavorite() {
         function closeVideo() {
             document.getElementById("videoModal").classList.remove("active");
             document.getElementById("videoFrame").src = "";
+        }
+
+        // 用藥提醒相關函數
+        function setMedicationTime() {
+            const timeInput = document.getElementById("medTimeInput");
+            medicationData.reminderTime = timeInput.value;
+            localStorage.setItem("medicationData", JSON.stringify(medicationData));
+            document.getElementById("reminderNote").textContent = "已設定提醒時間：" + timeInput.value;
+            alert("提醒時間已設定為：" + timeInput.value);
+        }
+
+        function markMedicationTaken() {
+            const today = new Date().toISOString().split('T')[0];
+            const btn = document.getElementById("takeMedBtn");
+            
+            // 檢查今天是否已經記錄
+            if (!medicationData.takenDates.includes(today)) {
+                medicationData.takenDates.push(today);
+                medicationData.lastTaken = new Date().toLocaleString("zh-TW");
+                localStorage.setItem("medicationData", JSON.stringify(medicationData));
+                
+                btn.textContent = "✓ 已服藥";
+                btn.classList.add("taken");
+                document.getElementById("lastTaken").textContent = "最後服藥：" + medicationData.lastTaken;
+                updateCompliance();
+                alert("記錄成功！今日已服藥");
+            } else {
+                alert("今日已經記錄過服藥了！");
+            }
+            
+            // 檢查今天的記錄狀態
+            checkTodayStatus();
+        }
+
+        function updateCompliance() {
+            // 計算過去7天的遵從率
+            const today = new Date();
+            let takenCount = 0;
+            let totalDays = 7;
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                if (medicationData.takenDates.includes(dateStr)) {
+                    takenCount++;
+                }
+            }
+            
+            const rate = Math.round((takenCount / totalDays) * 100);
+            document.getElementById("complianceRate").textContent = rate + "%";
+        }
+
+        function checkTodayStatus() {
+            const today = new Date().toISOString().split('T')[0];
+            const btn = document.getElementById("takeMedBtn");
+            
+            if (medicationData.takenDates.includes(today)) {
+                btn.textContent = "✓ 已服藥";
+                btn.classList.add("taken");
+            } else {
+                btn.textContent = "💊 記錄服藥";
+                btn.classList.remove("taken");
+            }
+        }
+
+        function loadMedicationData() {
+            const saved = localStorage.getItem("medicationData");
+            if (saved) {
+                medicationData = JSON.parse(saved);
+                document.getElementById("medTimeInput").value = medicationData.reminderTime || "08:00";
+                if (medicationData.lastTaken) {
+                    document.getElementById("lastTaken").textContent = "最後服藥：" + medicationData.lastTaken;
+                }
+            }
+            updateCompliance();
+            checkTodayStatus();
         }
 
         document.getElementById("searchInput").addEventListener("input", e => {
@@ -300,6 +420,8 @@ function toggleFavorite() {
 
         document.getElementById("version").textContent = APP_VERSION;
 
+        // 頁面載入時初始化用藥數據
+        loadMedicationData();
         renderHerbs();
     </script>
 </body>
