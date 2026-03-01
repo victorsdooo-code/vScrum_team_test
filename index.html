@@ -61,6 +61,8 @@
             <div class="detail-row"><span class="detail-label">歸經：</span><span class="detail-value" id="detailMeridian"></span></div>
             <div class="detail-row"><span class="detail-label">功效：</span><span class="detail-value" id="detailEffect"></span></div>
             <div class="detail-row"><span class="detail-label">臨床應用：</span><span class="detail-value" id="detailClinical"></span></div>
+            <div class="detail-row"><span class="detail-label">藥理作用：</span><span class="detail-value" id="detailPharmacology"></span></div>
+            <div class="detail-row"><span class="detail-label">化學成分：</span><span class="detail-value" id="detailChemistry"></span></div>
             <div class="detail-row"><span class="detail-label">用法：</span><span class="detail-value" id="detailUsage"></span></div>
             <div class="detail-row"><span class="detail-label">禁忌：</span><span class="detail-value" id="detailCaution"></span></div>
             <button class="favorite-btn" onclick="toggleFavorite()">⭐ 收藏</button>
@@ -68,19 +70,19 @@
     </div>
 
     <script>
-        const APP_VERSION = "v1.2.0";
+        const APP_VERSION = "v1.3.0";
         
         const herbs = [
-            { name: "人參", image: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200", category: "補氣", taste: "甘、微苦，性溫", meridian: "脾、肺、心、腎", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", clinical: "元氣虛脫、脾虛食少、肺虛喘咳、氣血兩虛、心悸失眠", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服", priority: 1 },
-            { name: "當歸", image: "https://images.unsplash.com/photo-1515578848228-a4f4d2ac1b8d?w=200", category: "補血", taste: "甘、辛，性溫", meridian: "肝、心、脾", effect: "補血活血，調經止痛，潤腸通便", clinical: "血虛萎黃、月經失調、痛經、便秘", usage: "煎服6-12克", caution: "濕盛中滿、大便溏泄者慎用", priority: 2 },
-            { name: "黃芪", image: "https://images.unsplash.com/photo-1576092768241-dec231844f74?w=200", category: "補氣", taste: "甘，性溫", meridian: "脾、肺", effect: "補氣升陽，固表止汗，利水消腫，托毒生肌", clinical: "脾氣虛弱、中氣下陷、自汗、水腫、久潰不癒", usage: "煎服9-30克", caution: "表實邪盛、氣滯濕阻者慎用", priority: 3 },
-            { name: "枸杞子", image: "https://images.unsplash.com/photo-1593159355404-8cb3a9d7b2bf?w=200", category: "補陰", taste: "甘，性平", meridian: "肝、腎、肺", effect: "滋補肝腎，益精明目，潤肺", clinical: "肝腎不足、視力模糊、腰膝酸軟、肺燥咳嗽", usage: "煎服6-12克", caution: "外感發熱、脾虛便溏者不宜", priority: 4 },
-            { name: "紅棗", image: "https://images.unsplash.com/photo-1598511726623-d2e9996e2d15?w=200", category: "補血", taste: "甘，性溫", meridian: "脾、胃", effect: "補中益氣，養血安神，緩和藥性", clinical: "脾胃虛弱、血虛心悸、失眠", usage: "煎服6-15克，或生食", caution: "濕盛、齲齒疼痛者慎用", priority: 5 },
-            { name: "菊花", image: "https://images.unsplash.com/photo-1597914377769-db5f3c6784c5?w=200", category: "清熱", taste: "甘、苦，性微寒", meridian: "肝、肺", effect: "疏散風熱，平肝明目，清熱解毒", clinical: "風熱感冒、頭痛眩暈、目赤腫痛、瘡毒", usage: "煎服5-10克", caution: "氣虛胃寒、食少泄瀉者慎用", priority: 6 },
-            { name: "陳皮", image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", category: "理氣", taste: "辛、苦，性溫", meridian: "脾、肺", effect: "理氣健脾，燥濕化痰", clinical: "脾胃氣滯、咳嗽痰多、胸悶腹脹", usage: "煎服3-10克", caution: "氣虛、陰虛燥咳者慎用", priority: 7 },
-            { name: "甘草", image: "https://images.unsplash.com/photo-1550572017-edd951b55104?w=200", category: "補氣", taste: "甘，性平", meridian: "心、肺、脾、胃", effect: "補脾益氣，清熱解毒，祛痰止咳，緩急止痛，調和諸藥", clinical: "脾胃虛弱、咳嗽痰多、咽喉腫痛、脘腹攣痛", usage: "煎服2-10克", caution: "不宜與海藻、甘遂、大戟等同用，長期服用需注意血壓", priority: 8 },
-            { name: "黨參", image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=200", category: "補氣", taste: "甘、微酸，性平", meridian: "脾、肺", effect: "補中益氣，健脾益肺，生津止渴", clinical: "脾胃虛弱、食慾不振、疲倦乏力、口乾", usage: "煎服9-15克", caution: "氣滯、肝火盛者慎用", priority: 9 },
-            { name: "白朮", image: "https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?w=200", category: "補氣", taste: "甘、苦，性溫", meridian: "脾、胃", effect: "健脾益胃，燥濕利水，止汗安胎", clinical: "脾胃虛弱、腹脹腹瀉、水腫、自汗、胎動不安", usage: "煎服6-12克", caution: "陰虛燥咳、津傷者慎用", priority: 10 },
+            { name: "人參", pharmacology: "調節免疫功能、抗疲勞、抗衰老、促進造血、抗腫瘤", image: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200", category: "補氣", taste: "甘、微苦，性溫", meridian: "脾、肺、心、腎", effect: "大補元氣，復脈固脫，補脾益肺，生津養血，安神益智", clinical: "元氣虛脫、脾虛食少、肺虛喘咳、氣血兩虛、心悸失眠", usage: "煎服3-9克，或研末吞服1-2克", caution: "實熱證、正虛表邪未解者慎用，忌與蘿蔔同服", priority: 1 },
+            { name: "當歸", pharmacology: "促進造血、抗炎、調節免疫、鎮痛、抗動脈粥樣硬化", image: "https://images.unsplash.com/photo-1515578848228-a4f4d2ac1b8d?w=200", category: "補血", taste: "甘、辛，性溫", meridian: "肝、心、脾", effect: "補血活血，調經止痛，潤腸通便", clinical: "血虛萎黃、月經失調、痛經、便秘", usage: "煎服6-12克", caution: "濕盛中滿、大便溏泄者慎用", priority: 2 },
+            { name: "黃芪", pharmacology: "增強免疫、利尿、抗衰老、保護肝腎、抗病毒", image: "https://images.unsplash.com/photo-1576092768241-dec231844f74?w=200", category: "補氣", taste: "甘，性溫", meridian: "脾、肺", effect: "補氣升陽，固表止汗，利水消腫，托毒生肌", clinical: "脾氣虛弱、中氣下陷、自汗、水腫、久潰不癒", usage: "煎服9-30克", caution: "表實邪盛、氣滯濕阻者慎用", priority: 3 },
+            { name: "枸杞子", pharmacology: "調節免疫、抗氧化、保肝明目、降血糖、抗衰老", image: "https://images.unsplash.com/photo-1593159355404-8cb3a9d7b2bf?w=200", category: "補陰", taste: "甘，性平", meridian: "肝、腎、肺", effect: "滋補肝腎，益精明目，潤肺", clinical: "肝腎不足、視力模糊、腰膝酸軟、肺燥咳嗽", usage: "煎服6-12克", caution: "外感發熱、脾虛便溏者不宜", priority: 4 },
+            { name: "紅棗", pharmacology: "補血、抗過敏、鎮靜安神、保肝增強免疫", image: "https://images.unsplash.com/photo-1598511726623-d2e9996e2d15?w=200", category: "補血", taste: "甘，性溫", meridian: "脾、胃", effect: "補中益氣，養血安神，緩和藥性", clinical: "脾胃虛弱、血虛心悸、失眠", usage: "煎服6-15克，或生食", caution: "濕盛、齲齒疼痛者慎用", priority: 5 },
+            { name: "菊花", pharmacology: "抗菌消炎、降壓、對心血管系統有保護作用", image: "https://images.unsplash.com/photo-1597914377769-db5f3c6784c5?w=200", category: "清熱", taste: "甘、苦，性微寒", meridian: "肝、肺", effect: "疏散風熱，平肝明目，清熱解毒", clinical: "風熱感冒、頭痛眩暈、目赤腫痛、瘡毒", usage: "煎服5-10克", caution: "氣虛胃寒、食少泄瀉者慎用", priority: 6 },
+            { name: "陳皮", pharmacology: "促進消化液分泌、祛痰、平喘、抗氧化", image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", category: "理氣", taste: "辛、苦，性溫", meridian: "脾、肺", effect: "理氣健脾，燥濕化痰", clinical: "脾胃氣滯、咳嗽痰多、胸悶腹脹", usage: "煎服3-10克", caution: "氣虛、陰虛燥咳者慎用", priority: 7 },
+            { name: "甘草", pharmacology: "抗炎、抗過敏、調節免疫、保肝解毒、止咳化痰", image: "https://images.unsplash.com/photo-1550572017-edd951b55104?w=200", category: "補氣", taste: "甘，性平", meridian: "心、肺、脾、胃", effect: "補脾益氣，清熱解毒，祛痰止咳，緩急止痛，調和諸藥", clinical: "脾胃虛弱、咳嗽痰多、咽喉腫痛、脘腹攣痛", usage: "煎服2-10克", caution: "不宜與海藻、甘遂、大戟等同用，長期服用需注意血壓", priority: 8 },
+            { name: "黨參", pharmacology: "增強免疫、抗疲勞、調節血糖、保護胃黏膜", image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=200", category: "補氣", taste: "甘、微酸，性平", meridian: "脾、肺", effect: "補中益氣，健脾益肺，生津止渴", clinical: "脾胃虛弱、食慾不振、疲倦乏力、口乾", usage: "煎服9-15克", caution: "氣滯、肝火盛者慎用", priority: 9 },
+            { name: "白朮", pharmacology: "利尿、調節免疫、抗氧化、保肝、健脾胃", image: "https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?w=200", category: "補氣", taste: "甘、苦，性溫", meridian: "脾、胃", effect: "健脾益胃，燥濕利水，止汗安胎", clinical: "脾胃虛弱、腹脹腹瀉、水腫、自汗、胎動不安", usage: "煎服6-12克", caution: "陰虛燥咳、津傷者慎用", priority: 10 },
             { name: "茯苓", category: "利水", taste: "甘、淡，性平", meridian: "心、脾、腎", effect: "利水滲濕，健脾寧心", clinical: "水腫、小便不利、痰飲、心悸失眠", usage: "煎服9-15克", caution: "腎虛者慎用", priority: 11 },
             { name: "山藥", category: "補氣", taste: "甘，性平", meridian: "脾、肺、腎", effect: "補脾益肺，益腎固精", clinical: "脾虛食少、肺虛喘咳、腎虛遺精", usage: "煎服15-30克", caution: "濕盛中滿者慎用", priority: 12 },
             { name: "生薑", category: "解表", taste: "辛，性溫", meridian: "脾、肺", effect: "解表散寒，溫中止嘔，溫肺止咳", clinical: "風寒感冒、胃寒嘔吐、肺寒咳嗽", usage: "煎服3-9克", caution: "陰虛火旺者慎用", priority: 13 },
@@ -174,6 +176,8 @@
             document.getElementById("detailMeridian").textContent = herb.meridian || "-";
             document.getElementById("detailEffect").textContent = herb.effect;
             document.getElementById("detailClinical").textContent = herb.clinical || "-";
+            document.getElementById("detailPharmacology").textContent = herb.pharmacology || "-";
+            document.getElementById("detailChemistry").textContent = herb.chemistry || "-";
             document.getElementById("detailUsage").textContent = herb.usage;
             document.getElementById("detailCaution").textContent = herb.caution;
             document.getElementById("detailModal").classList.add("active");
