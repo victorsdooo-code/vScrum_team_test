@@ -113,6 +113,16 @@
             <input type="text" id="searchInput" placeholder="🔍 搜尋中藥材...">
         </div>
 
+        
+        <div class="reminder-section" id="reminderSection" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <h3 style="margin-bottom:15px;">💊 用藥提醒</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+                <input type="time" id="reminderTime" style="padding:8px;border-radius:8px;border:none;">
+                <button onclick="addReminder()" style="background:#ffc107;color:#333;border:none;padding:8px 15px;border-radius:8px;cursor:pointer;">新增提醒</button>
+            </div>
+            <div id="reminderList"></div>
+        </div>
+
         <div class="herb-list" id="herbList"></div>
     </div>
 
@@ -142,7 +152,7 @@
     </div>
 
     <script>
-        const APP_VERSION = "v3.0.0";
+        const APP_VERSION = "v3.1.0";
         
         // 用藥提醒數據
         let medicationData = {
@@ -422,6 +432,47 @@
 
         // 頁面載入時初始化用藥數據
         loadMedicationData();
+        
+        let reminders = [];
+        
+        function addReminder() {
+            const time = document.getElementById("reminderTime").value;
+            if (!time) return alert("請選擇時間");
+            reminders.push({time: time, taken: false});
+            renderReminders();
+            saveReminders();
+        }
+        
+        function renderReminders() {
+            const list = document.getElementById("reminderList");
+            list.innerHTML = reminders.map((r, i) => `
+                <div style="background:rgba(255,255,255,0.2);padding:10px;border-radius:8px;margin:5px 0;display:flex;justify-content:space-between;align-items:center;">
+                    <span>${r.time}</span>
+                    <button onclick="toggleTaken(${i})" style="background:${r.taken ? '#4caf50' : '#fff'};color:${r.taken ? '#fff' : '#333'};border:none;padding:5px 10px;border-radius:5px;cursor:pointer;">
+                        ${r.taken ? '✅ 已服' : '💊 服用'}
+                    </button>
+                </div>
+            `).join("");
+        }
+        
+        function toggleTaken(i) {
+            reminders[i].taken = !reminders[i].taken;
+            renderReminders();
+            saveReminders();
+        }
+        
+        function saveReminders() {
+            localStorage.setItem("medReminders", JSON.stringify(reminders));
+        }
+        
+        function loadReminders() {
+            const saved = localStorage.getItem("medReminders");
+            if (saved) reminders = JSON.parse(saved);
+            renderReminders();
+        }
+        
+        loadReminders();
+
         renderHerbs();
     </script>
 </body>
